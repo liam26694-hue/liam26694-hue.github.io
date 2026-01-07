@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Para Mi Princesa</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Courier New", monospace;
+}
+body{
+    background:black;
+    overflow:hidden;
+    height:100vh;
+}
+
+/* BOTÓN INICIO */
+#btn{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    padding:16px 35px;
+    font-size:18px;
+    background:transparent;
+    border:2px solid #00ff66;
+    color:#00ff66;
+    cursor:pointer;
+    z-index:10;
+}
+#btn:hover{
+    background:#00ff66;
+    color:black;
+    box-shadow:0 0 20px #00ff66;
+}
+
+/* BOTÓN CONTINUAR */
+#continue{
+    display:none;
+    position:absolute;
+    bottom:15%;
+    left:50%;
+    transform:translateX(-50%);
+    padding:14px 30px;
+    font-size:18px;
+    background:#00ff66;
+    color:black;
+    border:none;
+    cursor:pointer;
+    box-shadow:0 0 20px #00ff66;
+    z-index:10;
+}
+
+/* MATRIX */
+canvas{
+    position:fixed;
+    inset:0;
+}
+
+/* TEXTO CENTRAL */
+#centerText{
+    position:fixed;
+    top:40%;
+    width:100%;
+    text-align:center;
+    color:#00ff66;
+    font-size:34px;
+    letter-spacing:4px;
+    opacity:0;
+    transition:1s;
+    z-index:5;
+}
+
+/* LOVE / YOU */
+.word{
+    position:absolute;
+    color:#00ff66;
+    font-size:18px;
+    white-space:pre;
+    opacity:1;
+    transition:1s;
+    z-index:3;
+}
+</style>
+</head>
+<body>
+
+<button id="btn">INICIAR ♥</button>
+<button id="continue">CONTINUAR</button>
+
+<div id="centerText"></div>
+<canvas id="matrix"></canvas>
+
+<audio id="music" src="san-lucas.mp3"></audio>
+
+<script>
+// ===== ELEMENTOS =====
+const btn = document.getElementById("btn");
+const cont = document.getElementById("continue");
+const music = document.getElementById("music");
+const centerText = document.getElementById("centerText");
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+// ===== MATRIX =====
+const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%";
+const size = 16;
+const cols = canvas.width / size;
+const drops = Array(Math.floor(cols)).fill(1);
+
+function drawMatrix(){
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#00ff66";
+    ctx.font = size + "px monospace";
+
+    drops.forEach((y,i)=>{
+        ctx.fillText(
+            chars[Math.floor(Math.random()*chars.length)],
+            i*size,
+            y*size
+        );
+        if(y*size > canvas.height && Math.random() > 0.98) drops[i] = 0;
+        drops[i]++;
+    });
+}
+let matrixInterval = setInterval(drawMatrix,33);
+
+// ===== TEXTOS SINCRONIZADOS =====
+const timedTexts = [
+    {time:5, text:"PARA MI PRINCESA"},
+    {time:20, text:"TE AMO"},
+    {time:40, text:"ERES LA MEJOR"},
+    {time:60, text:"NO QUIERO PERDERTE"}
+];
+let textIndex = 0;
+
+// ===== FORMAS LOVE / YOU =====
+const shapes = [
+[
+" L      OOO   V   V  EEEE",
+" L     O   O  V   V  E   ",
+" L     O   O   V V   EEEE",
+" L     O   O    V    E   ",
+" LLLLL  OOO     V    EEEE"
+],
+[
+" Y   Y  OOO   U   U",
+"  Y Y  O   O  U   U",
+"   Y   O   O  U   U",
+"   Y   O   O  U   U",
+"   Y    OOO    UUU "
+]
+];
+
+// ===== CREAR LOVE / YOU =====
+function crearWord(){
+    const shape = shapes[Math.floor(Math.random()*shapes.length)];
+    const el = document.createElement("div");
+    el.className = "word";
+
+    el.style.left = Math.random()*(innerWidth-300)+"px";
+    el.style.top = Math.random()*(innerHeight-200)+"px";
+
+    document.body.appendChild(el);
+
+    let l=0, c=0;
+    function escribir(){
+        if(l < shape.length){
+            if(c < shape[l].length){
+                el.textContent += shape[l][c];
+                c++;
+            }else{
+                el.textContent += "\n";
+                l++; c=0;
+            }
+            setTimeout(escribir,25);
+        }
+    }
+    escribir();
+
+    setTimeout(()=>el.remove(),12000);
+}
+
+// ===== MÚSICA =====
+music.addEventListener("timeupdate",()=>{
+    if(
+        textIndex < timedTexts.length &&
+        music.currentTime >= timedTexts[textIndex].time
+    ){
+        centerText.textContent = timedTexts[textIndex].text;
+        centerText.style.opacity = 1;
+        setTimeout(()=>centerText.style.opacity=0,4000);
+        textIndex++;
+    }
+
+    document.querySelectorAll(".word").forEach(w=>{
+        w.style.transform = `scale(${1 + Math.sin(music.currentTime*2)*0.08})`;
+    });
+});
+
+// ===== FINAL =====
+music.addEventListener("ended",()=>{
+    clearInterval(matrixInterval);
+    centerText.textContent = "PARA MI PRINCESA ♥";
+    centerText.style.opacity = 1;
+    cont.style.display = "block";
+});
+
+// ===== BOTONES =====
+btn.onclick = ()=>{
+    btn.remove();
+    music.play();
+    setInterval(crearWord,2500);
+};
+
+cont.onclick = ()=>{
+    window.location.href = "carta.html";
+};
+</script>
+
+</body>
+</html>

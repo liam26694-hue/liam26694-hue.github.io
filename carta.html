@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Para Ti, Mi Princesa</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:linear-gradient(120deg,#0b0b0b,#111);
+    min-height:100vh;
+    font-family:"Georgia", serif;
+    overflow-y:auto;
+    color:#e6e6e6;
+}
+
+/* BOTÓN MUSICA */
+#playMusic{
+    position:fixed;
+    top:20px;
+    right:20px;
+    padding:12px 22px;
+    background:#c9a24d;
+    color:#1b1b1b;
+    border:none;
+    border-radius:25px;
+    cursor:pointer;
+    font-size:14px;
+    box-shadow:0 0 15px rgba(201,162,77,.6);
+    z-index:20;
+}
+
+/* LUZ DE VELA OSCURA */
+.candle-light{
+    position:fixed;
+    inset:-30%;
+    background:radial-gradient(circle,
+        rgba(255,190,100,.25),
+        rgba(255,190,100,.12),
+        transparent 70%);
+    animation:flicker 4s infinite;
+    pointer-events:none;
+    z-index:1;
+}
+
+@keyframes flicker{
+    0%{opacity:.35}
+    25%{opacity:.55}
+    50%{opacity:.4}
+    75%{opacity:.6}
+    100%{opacity:.45}
+}
+
+/* CARTA */
+.paper{
+    background:rgba(20,20,20,.95);
+    width:90%;
+    max-width:900px;
+    margin:140px auto;
+    padding:60px;
+    border-radius:12px;
+    box-shadow:
+        0 30px 60px rgba(0,0,0,.8),
+        inset 0 0 40px rgba(255,200,120,.05);
+    position:relative;
+    z-index:5;
+    animation:paperIn 2.5s ease forwards;
+}
+
+/* ANIMACIÓN ENTRADA */
+@keyframes paperIn{
+    from{
+        opacity:0;
+        transform:translateY(50px);
+        filter:blur(12px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+        filter:blur(0);
+    }
+}
+
+/* BORDE */
+.paper::before{
+    content:"";
+    position:absolute;
+    inset:14px;
+    border:1px solid rgba(255,255,255,.08);
+    pointer-events:none;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:35px;
+    color:#f0d68c;
+}
+
+/* TEXTO */
+#text{
+    font-size:20px;
+    line-height:1.9;
+    white-space:pre-wrap;
+}
+
+/* FIRMA */
+.signature{
+    margin-top:45px;
+    text-align:right;
+    font-size:22px;
+    font-style:italic;
+    color:#f0d68c;
+}
+
+/* CORAZONES */
+.heart{
+    position:absolute;
+    color:#ff6b81;
+    font-size:18px;
+    animation:float 12s linear infinite;
+    opacity:.6;
+    pointer-events:none;
+    z-index:2;
+}
+
+@keyframes float{
+    from{
+        transform:translateY(100vh) scale(.5);
+        opacity:0;
+    }
+    to{
+        transform:translateY(-10vh) scale(1.1);
+        opacity:1;
+    }
+}
+</style>
+</head>
+<body>
+
+<button id="playMusic">🎵 Reproducir música</button>
+
+<div class="candle-light"></div>
+
+<div class="paper">
+    <h1>Para ti, mi princesa</h1>
+    <div id="text"></div>
+    <div class="signature">Con amor, Lisandro ♥</div>
+</div>
+
+<audio id="music" src="san-lucas.mp3" loop></audio>
+
+<script>
+// ===== TEXTO CARTA =====
+const carta = `
+Mi amor,
+
+Quiero que sepas, desde lo más profundo de mi corazón, que te amo con una intensidad que a veces no sé cómo expresar con palabras. No existe un solo día, ni un solo instante, en el que no estés presente en mis pensamientos. Estás en todo: en mis sueños, en mis metas, en mis silencios y en mis sonrisas.
+
+Admiro profundamente quién eres. Admiro tu fuerza cuando el cansancio intenta vencerte, tu dedicación cuando nadie más ve el esfuerzo, y ese corazón tan inmenso que llevas dentro. Para mí, eres la mejor voleibolista, sí, pero mucho más que eso: eres una mujer increíble, inspiradora, valiente y llena de luz. Verte luchar por lo que amas me motiva a ser mejor cada día.
+
+Sueño con un futuro donde estemos siempre juntos, caminando de la mano, creciendo, apoyándonos incluso en los días difíciles, aprendiendo uno del otro y celebrando cada logro, por pequeño que sea. Sueño con construir una historia donde el amor sea más fuerte que cualquier problema, donde el respeto y la comprensión siempre tengan la última palabra.
+
+No quiero que volvamos a pelear. Quiero aprender a cuidarte mejor, a escucharte con el corazón y no solo con los oídos, a entender tus silencios y abrazarte cuando las palabras no alcancen. Quiero ser tu refugio, tu apoyo, la persona en la que siempre puedas confiar.
+
+Perdóname por los errores que a veces cometo. Nunca, jamás, han sido por falta de amor. Al contrario, nacen de mis imperfecciones, de mi proceso de aprendizaje, de mis ganas de ser mejor para ti. Estoy aprendiendo, paso a paso, a amar de la manera que mereces.
+
+Gracias por existir, por quedarte, por intentar incluso cuando todo parece complicado. Gracias por enseñarme lo que es amar de verdad. Prometo seguir esforzándome, seguir creciendo y nunca rendirme contigo.
+
+Te amo más de lo que las palabras pueden decir, más de lo que el tiempo puede medir.
+Te amo hoy, mañana y siempre. ❤️.
+`;
+
+const el = document.getElementById("text");
+let i = 0;
+
+function escribir(){
+    if(i < carta.length){
+        el.textContent += carta[i++];
+        setTimeout(escribir, 38);
+    }
+}
+escribir();
+
+// ===== CORAZONES =====
+function crearCorazon(){
+    const h = document.createElement("div");
+    h.className="heart";
+    h.textContent="♥";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=14+Math.random()*20+"px";
+    h.style.animationDuration=7+Math.random()*6+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),14000);
+}
+setInterval(crearCorazon,900);
+
+// ===== MUSICA =====
+const music = document.getElementById("music");
+document.getElementById("playMusic").onclick = ()=>{
+    music.play();
+};
+</script>
+
+</body>
+</html>
